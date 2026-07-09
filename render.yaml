@@ -1,0 +1,75 @@
+# Render Blueprint — provisions Postgres, Redis, the FastAPI backend, and
+# (optionally) the Next.js frontend. In the Render dashboard: New → Blueprint,
+# point it at this repo. Secrets marked `sync: false` are entered in the dashboard.
+databases:
+  - name: jewelai-postgres
+    databaseName: jewelai
+    user: jewelai
+    plan: free
+
+services:
+  # Redis (Render lists this product as "Key Value"; type stays `redis`).
+  - type: redis
+    name: jewelai-redis
+    plan: free
+    ipAllowList: []
+
+  - type: web
+    name: jewelai-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jewelai-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: jewelai-redis
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        sync: false # must equal the frontend's NEXTAUTH_SECRET
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-sonnet-5
+      - key: CORS_ORIGINS
+        sync: false # the frontend's public URL
+
+  # Frontend can also live on Vercel; this hosts it on Render alongside the API.
+  - type: web
+    name: jewelai-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    dockerBuildArgs:
+      NEXT_PUBLIC_API_URL: https://jewelai-backend.onrender.com
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jewelai-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: jewelai-redis
+          property: connectionString
+      - key: NEXTAUTH_URL
+        sync: false # this service's public URL
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        value: https://jewelai-backend.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

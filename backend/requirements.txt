@@ -1,0 +1,28 @@
+fastapi==0.139.0
+uvicorn[standard]==0.50.2
+pydantic==2.13.4
+pydantic-settings==2.14.2
+
+# Data processing
+pandas==3.0.3
+openpyxl==3.1.5
+duckdb==1.5.4
+
+# AI (Google Gemini)
+google-genai==1.46.0
+
+# Database & cache
+asyncpg==0.31.0
+redis==8.0.1
+
+# Auth & security
+python-jose[cryptography]==3.5.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.32
+slowapi==0.1.10
+
+# Reports
+reportlab==5.0.0
+xlsxwriter==3.2.9
+
+python-dotenv==1.2.2

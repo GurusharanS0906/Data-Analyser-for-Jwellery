@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.ruff_cache/
+storage/uploads/*
+storage/processed/*
+storage/reports/*
+!storage/uploads/.gitkeep
+!storage/reports/.gitkeep
+*.duckdb
+.git/
+tests/
+Dockerfile
+.dockerignore
